@@ -30,7 +30,19 @@
     "error_update_failed": "Failed to update todo",
     "error_remove_failed": "Failed to remove todo",
     "error_rename_failed": "Failed to rename page",
-    "error_delete_failed": "Failed to delete page"
+    "error_delete_failed": "Failed to delete page",
+    "exported_todos": "Todos exported to ~/Documents/",
+    "export_failed": "Failed to export todos",
+    "export_title": "Todo List",
+    "export_page_header": "📁 {pageName}",
+    "export_active_section": "○ Active ({count})",
+    "export_completed_section": "✓ Completed ({count})",
+    "export_priority": "Priority",
+    "export_created": "Created",
+    "export_details": "Details",
+    "priority_high": "High",
+    "priority_medium": "Medium",
+    "priority_low": "Low"
   },
   "panel": {
     "add_todo": {
@@ -42,6 +54,7 @@
     },
     "header": {
       "clear_completed_button": "Clear Completed",
+      "export_button": "Export",
       "title": "Todo List"
     },
     "todo_details": {

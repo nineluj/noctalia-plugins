@@ -1,4 +1,5 @@
 import QtQuick
+import Quickshell
 import Quickshell.Io
 import qs.Commons
 import qs.Services.UI
@@ -7,6 +8,19 @@ Item {
   property var pluginApi: null
   property var rawTodos: []
   property var rawPages: []
+
+  // Process for exporting todos
+  Process {
+    id: exportProcess
+    running: false
+    onExited: function(code) {
+      if (code === 0) {
+        ToastService.showNotice(pluginApi.tr("main.exported_todos"));
+      } else {
+        ToastService.showError(pluginApi.tr("main.export_failed"));
+      }
+    }
+  }
 
   // ============================================
   // Initialization
@@ -252,6 +266,11 @@ Item {
       } else {
         ToastService.showError(pluginApi.tr("main.error_delete_failed"));
       }
+    }
+
+    // Export
+    function exportTodos() {
+      doExportTodos();
     }
   }
 
@@ -534,5 +553,125 @@ Item {
   // Calculate completed count
   function calculateCompletedCount() {
     return rawTodos.filter(t => t.completed).length;
+  }
+
+  // Export todos to markdown file
+  function doExportTodos() {
+    if (!pluginApi) {
+      return;
+    }
+    var markdown = generateExportMarkdown();
+    exportTodosToFile(markdown);
+  }
+
+  // Export todos to markdown file
+  function exportTodosToFile(markdownContent) {
+    try {
+      var timestamp = new Date().toISOString().split("T")[0];
+      var fileName = "todo_" + timestamp + ".md";
+      var filePath = Quickshell.env("HOME") + "/Documents/" + fileName;
+
+      // Use base64 encoding to safely pass content through shell
+      var base64 = Qt.btoa(markdownContent);
+
+      exportProcess.command = ["sh", "-c", `echo "${base64}" | base64 -d > "${filePath}"`];
+      exportProcess.running = true;
+    } catch (e) {
+      Logger.e("Todo", "Export error: " + e);
+      ToastService.showError(pluginApi.tr("main.export_failed"));
+    }
+  }
+
+  // Generate markdown content from todos
+  function generateExportMarkdown() {
+    var lines = [];
+    var INDENT = "  ";
+    var ITEM_PREFIX = "- ";
+    var SUB_ITEM_PREFIX = INDENT + "- ";
+    var DETAIL_PREFIX = INDENT + INDENT + "- ";
+
+    // Header
+    lines.push("# " + pluginApi.tr("main.export_title"));
+    lines.push("");
+    lines.push("---");
+    lines.push("");
+
+    // Process each page
+    for (var p = 0; p < rawPages.length; p++) {
+      var page = rawPages[p];
+      var pageId = page.id;
+      var pageName = page.name;
+
+      // Page header
+      var pageHeader = pluginApi.tr("main.export_page_header").replace("{pageName}", pageName);
+      lines.push("## " + pageHeader);
+      lines.push("");
+
+      // Get todos for this page
+      var pageTodos = rawTodos.filter(function(t) { return t.pageId === pageId; });
+      var activeTodos = pageTodos.filter(function(t) { return !t.completed; });
+      var completedTodos = pageTodos.filter(function(t) { return t.completed; });
+
+      // Render active todos (always show section, even if empty)
+      var activeSection = pluginApi.tr("main.export_active_section").replace("{count}", activeTodos.length);
+      lines.push("### " + activeSection);
+      lines.push("");
+      renderTodoList(lines, activeTodos, false, INDENT, ITEM_PREFIX, SUB_ITEM_PREFIX, DETAIL_PREFIX);
+
+      // Render completed todos (always show section, even if empty)
+      var completedSection = pluginApi.tr("main.export_completed_section").replace("{count}", completedTodos.length);
+      lines.push("### " + completedSection);
+      lines.push("");
+      renderTodoList(lines, completedTodos, true, INDENT, ITEM_PREFIX, SUB_ITEM_PREFIX, DETAIL_PREFIX);
+
+      // Page separator
+      lines.push("---");
+      lines.push("");
+    }
+
+    return lines.join("\n");
+  }
+
+  // Render a list of todos
+  function renderTodoList(lines, todos, completed, indent, itemPrefix, subItemPrefix, detailPrefix) {
+    var checkbox = completed ? "[x]" : "[ ]";
+
+    for (var i = 0; i < todos.length; i++) {
+      var todo = todos[i];
+      var priorityLabel = getPriorityLabel(todo.priority || "medium");
+
+      lines.push(itemPrefix + checkbox + " " + todo.text);
+      lines.push(subItemPrefix + pluginApi.tr("main.export_priority") + ": " + priorityLabel);
+
+      // Created date
+      if (todo.createdAt) {
+        var createdDate = todo.createdAt.split("T")[0];
+        lines.push(subItemPrefix + pluginApi.tr("main.export_created") + ": " + createdDate);
+      }
+
+      // Details - use list format
+      if (todo.details && todo.details.trim()) {
+        lines.push(subItemPrefix + pluginApi.tr("main.export_details") + ":");
+        var detailsLines = todo.details.trim().split("\n");
+        for (var d = 0; d < detailsLines.length; d++) {
+          lines.push(detailPrefix + detailsLines[d]);
+        }
+      }
+      lines.push("");
+    }
+  }
+
+  // Get priority label (text only)
+  function getPriorityLabel(priority) {
+    switch (priority) {
+      case "high":
+        return pluginApi.tr("main.priority_high");
+      case "medium":
+        return pluginApi.tr("main.priority_medium");
+      case "low":
+        return pluginApi.tr("main.priority_low");
+      default:
+        return pluginApi.tr("main.priority_medium");
+    }
   }
 }
