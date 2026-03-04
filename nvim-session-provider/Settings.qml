@@ -31,8 +31,8 @@ ColumnLayout {
       spacing: Style.marginL
 
       NLabel {
-          label: pluginApi?.tr("settings.nvim.title") || "Neovim command"
-          description: pluginApi?.tr("settings.nvim.description") || "The Neovim executable or frontend to use. GUI frontends should include `--` after the command, e.g. `nvim-qt --`."
+          label: pluginApi.tr("settings.nvim.title")
+          description: pluginApi.tr("settings.nvim.description")
       }
 
       NTextInput {
@@ -44,27 +44,27 @@ ColumnLayout {
 
       NCheckbox {
           Layout.fillWidth: true
-          label: pluginApi?.tr("settings.runInTerminal.label") || "Run in terminal"
-          description: pluginApi?.tr("settings.runInTerminal.description") || "Whether to run the command in a terminal emulator. Should be checked when using plain text-based nvim, and unchecked when using a GUI frontend."
+          label: pluginApi.tr("settings.runInTerminal.label")
+          description: pluginApi.tr("settings.runInTerminal.description") 
           checked: root.editRunInTerminal
           onToggled: (checked) => root.editRunInTerminal = checked
       }
 
       NTextInputButton {
-          label: pluginApi?.tr("settings.sessionDir.label") || "Session file directory"
-          description: pluginApi?.tr("settings.sessionDir.description") || "Location where Neovim session files are stored"
+          label: pluginApi.tr("settings.sessionDir.label")
+          description: pluginApi.tr("settings.sessionDir.description")
           placeholderText: "~/.local/share/nvim/sessions"
           text: root.editSessionDir
           buttonIcon: "folder"
-          buttonTooltip: pluginApi?.tr("settings.sessionDir.select") || "Select folder"
+          buttonTooltip: pluginApi.tr("settings.sessionDir.select")
           onInputEditingFinished: root.editSessionDir = text
           onButtonClicked: filePicker.openFilePicker()
       }
 
       NCheckbox {
           Layout.fillWidth: true
-          label: pluginApi?.tr("settings.includeInSearch.label") || "Include in main search"
-          description: pluginApi?.tr("settings.includeInSearch.description") || "Whether to include Neovim sessions in the main launcher search results"
+          label: pluginApi.tr("settings.includeInSearch.label")
+          description: pluginApi.tr("settings.includeInSearch.description")
           checked: root.editIncludeInSearch
           onToggled: (checked) => root.editIncludeInSearch = checked
       }
@@ -74,7 +74,7 @@ ColumnLayout {
   NFilePicker {
       id: filePicker
       selectionMode: "folders"
-      title: pluginApi?.tr("settings.sessionDir.title") || "Select a session file directory"
+      title: pluginApi.tr("settings.sessionDir.title")
       initialPath: root.editSessionDir
       onAccepted: paths => {
           if (paths.length > 0) {

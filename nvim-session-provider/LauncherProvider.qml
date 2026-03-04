@@ -174,7 +174,7 @@ Item {
     function commands() {
         return [{
             "name": ">nvim",
-            "description": pluginApi?.tr("launcher.description") || "Search and open Neovim sessions",
+            "description": pluginApi.tr("launcher.description"),
             "icon": "code",
             "isTablerIcon": true,
             "isImage": false,
@@ -194,8 +194,8 @@ Item {
 
             if (loading) {
               return [{
-                "name": pluginApi?.tr("launcher.loading.title") || "Loading...",
-                "description": pluginApi?.tr("launcher.loading.description") || "Loading sessions...",
+                "name": pluginApi.tr("launcher.loading.title"),
+                "description": pluginApi.tr("launcher.loading.description"),
                 "icon": "refresh",
                 "isTablerIcon": true,
                 "isImage": false,
@@ -205,8 +205,8 @@ Item {
 
             if (!loaded) {
               return [{
-                "name": pluginApi?.tr("launcher.error.title") || "Neovim sessions not loaded",
-                "description": pluginApi?.tr("launcher.error.description") || "Check your log for error messages",
+                "name": pluginApi.tr("launcher.error.title"),
+                "description": pluginApi.tr("launcher.error.description"),
                 "icon": "alert-circle",
                 "isTablerIcon": true,
                 "isImage": false,
