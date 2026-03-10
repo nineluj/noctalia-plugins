@@ -5,26 +5,23 @@ import qs.Services.Media
 Item {
     id: core
 
-    property var    pluginApi:        null
-    property string fixedOrientation: "up"
-    property real   widgetScaleHint:  1.0
+    property string orientation:     "up"
+    property real   widgetScaleHint: 1.0
 
-    readonly property string visMode:      pluginApi?.pluginSettings?.mode                  ?? "bars"
-    readonly property int    barCount:     pluginApi?.pluginSettings?.barCount              ?? 64
-    readonly property int    fps:          pluginApi?.pluginSettings?.fps                   ?? 60
-    readonly property real   sensitivity:  pluginApi?.pluginSettings?.sensitivity           ?? 1.5
-    readonly property real   smoothingVal: pluginApi?.pluginSettings?.smoothing             ?? 0.18
-    readonly property bool   useGradient:  pluginApi?.pluginSettings?.useGradient           ?? true
-    readonly property bool   fadeWhenIdle: pluginApi?.pluginSettings?.fadeWhenIdle          ?? true
-    readonly property bool   useCustomColors:  pluginApi?.pluginSettings?.useCustomColors   ?? false
-    readonly property color  customPrimary:    pluginApi?.pluginSettings?.customPrimaryColor    ?? "#6750A4"
-    readonly property color  customSecondary:  pluginApi?.pluginSettings?.customSecondaryColor  ?? "#625B71"
-    readonly property int    customWidth:  pluginApi?.pluginSettings?.customWidth           ?? 0
-    readonly property int    customHeight: pluginApi?.pluginSettings?.customHeight          ?? 0
+    property string visMode:         "bars"
+    property int    barCount:        64
+    property int    fps:             60
+    property real   sensitivity:     1.5
+    property real   smoothingVal:    0.18
+    property bool   useGradient:     true
+    property bool   fadeWhenIdle:    true
+    property bool   useCustomColors: false
+    property color  customPrimary:   "#6750A4"
+    property color  customSecondary: "#625B71"
 
     readonly property color colorA: useCustomColors ? customPrimary   : Color.mPrimary
     readonly property color colorB: useCustomColors ? customSecondary : Color.mSecondary
-    readonly property bool isVertical: fixedOrientation === "left" || fixedOrientation === "right"
+    readonly property bool isVertical: orientation === "left" || orientation === "right"
 
     opacity: (fadeWhenIdle && SpectrumService.isIdle) ? 0.0 : 1.0
     Behavior on opacity { NumberAnimation { duration: 600; easing.type: Easing.InOutQuad } }
@@ -44,6 +41,17 @@ Item {
                                    : arr[i] + (raw - arr[i]) * slow
         }
         smoothed = arr
+    }
+
+    function symmetricBands(n) {
+        var out = []
+        for (var i = 0; i < n; i++) {
+            var distFromCenter = Math.abs(i - (n - 1) / 2)
+            var t  = distFromCenter / ((n - 1) / 2)
+            var si = Math.floor(t * 31)
+            out.push(smoothed[si] || 0.0)
+        }
+        return out
     }
 
     Connections {
@@ -80,21 +88,19 @@ Item {
             else                               _paintBars(ctx)
         }
 
-        // ── BARS ──────────────────────────────────────────────────────────────
         function _paintBars(ctx) {
             var n        = core.barCount
-            var levels   = core.smoothed
+            var levels   = core.symmetricBands(n)
             var W        = width
             var H        = height
-            var ori      = core.fixedOrientation
+            var ori      = core.orientation
             var vert     = core.isVertical
             var trackLen = vert ? H : W
             var crossLen = vert ? W : H
             var gap      = 4
 
             for (var i = 0; i < n; i++) {
-                var si    = Math.floor(i / n * 32)
-                var level = Math.min(1.0, Math.max(0.0, levels[si] || 0))
+                var level = Math.min(1.0, Math.max(0.0, levels[i] || 0))
                 var blen  = Math.max(1, level * crossLen)
                 var p1    = Math.floor(i       / n * trackLen)
                 var p2    = Math.floor((i + 1) / n * trackLen)
@@ -121,10 +127,9 @@ Item {
             }
         }
 
-        // ── MIRROR ────────────────────────────────────────────────────────────
         function _paintMirror(ctx) {
             var n        = core.barCount
-            var levels   = core.smoothed
+            var levels   = core.symmetricBands(n)
             var W        = width
             var H        = height
             var vert     = core.isVertical
@@ -134,8 +139,7 @@ Item {
             var gap      = 4
 
             for (var i = 0; i < n; i++) {
-                var si    = Math.floor(i / n * 32)
-                var level = Math.min(1.0, Math.max(0.0, levels[si] || 0))
+                var level = Math.min(1.0, Math.max(0.0, levels[i] || 0))
                 var half  = Math.max(1, level * mid)
                 var p1    = Math.floor(i       / n * trackLen)
                 var p2    = Math.floor((i + 1) / n * trackLen)
@@ -158,13 +162,12 @@ Item {
             }
         }
 
-        // ── WAVE — smooth filled blob, mirrored from center ───────────────────
         function _paintWave(ctx) {
-            var levels = core.smoothed
+            var n      = 64
+            var levels = core.symmetricBands(n)
             var W      = width
             var H      = height
             var vert   = core.isVertical
-            var n      = 32  // use all 32 bands for smooth shape
 
             if (core.useGradient) {
                 var g = vert ? ctx.createLinearGradient(0,0,W,0) : ctx.createLinearGradient(0,0,0,H)
@@ -180,43 +183,27 @@ Item {
 
             if (vert) {
                 var midX = W * 0.5
-                // Forward: left edge top to bottom
                 ctx.moveTo(midX, 0)
                 for (var i = 0; i < n; i++) {
-                    var si  = Math.floor(i / n * 32)
-                    var lvl = Math.min(1.0, Math.max(0.0, levels[si] || 0))
-                    var y   = (i / (n - 1)) * H
-                    var x   = midX - lvl * midX * 0.92
-                    ctx.lineTo(x, y)
+                    var lvl = Math.min(1.0, Math.max(0.0, levels[i] || 0))
+                    ctx.lineTo(midX - lvl * midX * 0.92, (i / (n - 1)) * H)
                 }
-                // Return: right edge bottom to top
                 ctx.lineTo(midX, H)
                 for (var i = n - 1; i >= 0; i--) {
-                    var si  = Math.floor(i / n * 32)
-                    var lvl = Math.min(1.0, Math.max(0.0, levels[si] || 0))
-                    var y   = (i / (n - 1)) * H
-                    var x   = midX + lvl * midX * 0.92
-                    ctx.lineTo(x, y)
+                    var lvl = Math.min(1.0, Math.max(0.0, levels[i] || 0))
+                    ctx.lineTo(midX + lvl * midX * 0.92, (i / (n - 1)) * H)
                 }
             } else {
                 var midY = H * 0.5
-                // Forward: top edge left to right
                 ctx.moveTo(0, midY)
                 for (var i = 0; i < n; i++) {
-                    var si  = Math.floor(i / n * 32)
-                    var lvl = Math.min(1.0, Math.max(0.0, levels[si] || 0))
-                    var x   = (i / (n - 1)) * W
-                    var y   = midY - lvl * midY * 0.92
-                    ctx.lineTo(x, y)
+                    var lvl = Math.min(1.0, Math.max(0.0, levels[i] || 0))
+                    ctx.lineTo((i / (n - 1)) * W, midY - lvl * midY * 0.92)
                 }
-                // Return: bottom edge right to left
                 ctx.lineTo(W, midY)
                 for (var i = n - 1; i >= 0; i--) {
-                    var si  = Math.floor(i / n * 32)
-                    var lvl = Math.min(1.0, Math.max(0.0, levels[si] || 0))
-                    var x   = (i / (n - 1)) * W
-                    var y   = midY + lvl * midY * 0.92
-                    ctx.lineTo(x, y)
+                    var lvl = Math.min(1.0, Math.max(0.0, levels[i] || 0))
+                    ctx.lineTo((i / (n - 1)) * W, midY + lvl * midY * 0.92)
                 }
             }
 

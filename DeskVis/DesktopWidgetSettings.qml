@@ -5,30 +5,41 @@ import qs.Widgets
 
 ColumnLayout {
     id: root
-
-    property var pluginApi: null
-    property var screen: null
-
     spacing: Style.marginM
 
-    // ── Local state ───────────────────────────────────────────────────────────
-    property string valueMode:            pluginApi?.pluginSettings?.mode            ?? "bars"
-    property int    valueBarCount:        pluginApi?.pluginSettings?.barCount        ?? 32
-    property int    valueFps:             pluginApi?.pluginSettings?.fps             ?? 60
-    property real   valueSensitivity:     pluginApi?.pluginSettings?.sensitivity     ?? 1.5
-    property real   valueSmoothing:       pluginApi?.pluginSettings?.smoothing       ?? 0.18
-    property bool   valueUseGradient:     pluginApi?.pluginSettings?.useGradient     ?? true
-    property bool   valueFadeWhenIdle:    pluginApi?.pluginSettings?.fadeWhenIdle    ?? true
-    property bool   valueUseCustomColors: pluginApi?.pluginSettings?.useCustomColors ?? false
-    property color  valueCustomPrimary:   pluginApi?.pluginSettings?.customPrimaryColor   ?? "#6750A4"
-    property color  valueCustomSecondary: pluginApi?.pluginSettings?.customSecondaryColor ?? "#625B71"
-    property int    valueCustomWidth:     pluginApi?.pluginSettings?.customWidth  ?? 0
-    property int    valueCustomHeight:    pluginApi?.pluginSettings?.customHeight ?? 0
+    property var pluginApi: null
+    property var widgetSettings: null
 
-    // ── Header ────────────────────────────────────────────────────────────────
-    NHeader {
-        label: pluginApi?.manifest?.name ?? "DeskVis"
-        description: "Audio visualizer settings"
+    property string valueDirection:       widgetSettings?.data?.direction             ?? "up"
+    property string valueMode:            widgetSettings?.data?.mode                  ?? "bars"
+    property int    valueBarCount:        widgetSettings?.data?.barCount              ?? 32
+    property int    valueFps:             widgetSettings?.data?.fps                   ?? 60
+    property real   valueSensitivity:     widgetSettings?.data?.sensitivity           ?? 1.5
+    property real   valueSmoothing:       widgetSettings?.data?.smoothing             ?? 0.18
+    property bool   valueUseGradient:     widgetSettings?.data?.useGradient           ?? true
+    property bool   valueFadeWhenIdle:    widgetSettings?.data?.fadeWhenIdle          ?? true
+    property bool   valueUseCustomColors: widgetSettings?.data?.useCustomColors       ?? false
+    property color  valueCustomPrimary:   widgetSettings?.data?.customPrimaryColor    ?? "#6750A4"
+    property color  valueCustomSecondary: widgetSettings?.data?.customSecondaryColor  ?? "#625B71"
+    property int    valueCustomWidth:     widgetSettings?.data?.customWidth           ?? 0
+    property int    valueCustomHeight:    widgetSettings?.data?.customHeight          ?? 0
+
+    // ── Direction ─────────────────────────────────────────────────────────────
+    NComboBox {
+        Layout.fillWidth: true
+        label: "Direction"
+        description: "Which way the visualizer grows"
+        model: [
+            { "key": "up",    "name": "Up"    },
+            { "key": "down",  "name": "Down"  },
+            { "key": "left",  "name": "Left"  },
+            { "key": "right", "name": "Right" }
+        ]
+        currentKey: root.valueDirection
+        onSelected: key => {
+            root.valueDirection = key
+            root.saveSettings()
+        }
     }
 
     // ── Visualizer mode ───────────────────────────────────────────────────────
@@ -42,7 +53,10 @@ ColumnLayout {
             { "key": "mirror", "name": "Mirror" }
         ]
         currentKey: root.valueMode
-        onSelected: key => root.valueMode = key
+        onSelected: key => {
+            root.valueMode = key
+            root.saveSettings()
+        }
     }
 
     // ── Bar count (bars + mirror only) ────────────────────────────────────────
@@ -54,7 +68,11 @@ ColumnLayout {
         from: 8
         to: 64
         stepSize: 1
+        defaultValue: 32
         onMoved: value => root.valueBarCount = Math.round(value)
+        onPressedChanged: (pressed, value) => {
+            if (!pressed) { root.valueBarCount = Math.round(value); root.saveSettings() }
+        }
     }
 
     // ── Sensitivity ───────────────────────────────────────────────────────────
@@ -65,7 +83,11 @@ ColumnLayout {
         from: 0.5
         to: 3.0
         stepSize: 0.1
+        defaultValue: 1.5
         onMoved: value => root.valueSensitivity = value
+        onPressedChanged: (pressed, value) => {
+            if (!pressed) { root.valueSensitivity = value; root.saveSettings() }
+        }
     }
 
     // ── Smoothing ─────────────────────────────────────────────────────────────
@@ -77,7 +99,11 @@ ColumnLayout {
         from: 0.02
         to: 0.5
         stepSize: 0.01
+        defaultValue: 0.18
         onMoved: value => root.valueSmoothing = value
+        onPressedChanged: (pressed, value) => {
+            if (!pressed) { root.valueSmoothing = value; root.saveSettings() }
+        }
     }
 
     // ── FPS ───────────────────────────────────────────────────────────────────
@@ -95,7 +121,10 @@ ColumnLayout {
             { "key": "240", "name": "240 fps" }
         ]
         currentKey: String(root.valueFps)
-        onSelected: key => root.valueFps = parseInt(key)
+        onSelected: key => {
+            root.valueFps = parseInt(key)
+            root.saveSettings()
+        }
     }
 
     // ── Size ──────────────────────────────────────────────────────────────────
@@ -107,7 +136,11 @@ ColumnLayout {
         from: 0
         to: 1920
         stepSize: 10
+        defaultValue: 0
         onMoved: value => root.valueCustomWidth = Math.round(value)
+        onPressedChanged: (pressed, value) => {
+            if (!pressed) { root.valueCustomWidth = Math.round(value); root.saveSettings() }
+        }
     }
 
     NValueSlider {
@@ -118,7 +151,11 @@ ColumnLayout {
         from: 0
         to: 1080
         stepSize: 10
+        defaultValue: 0
         onMoved: value => root.valueCustomHeight = Math.round(value)
+        onPressedChanged: (pressed, value) => {
+            if (!pressed) { root.valueCustomHeight = Math.round(value); root.saveSettings() }
+        }
     }
 
     // ── Toggles ───────────────────────────────────────────────────────────────
@@ -126,21 +163,33 @@ ColumnLayout {
         label: "Color Gradient"
         description: "Blend primary → secondary color"
         checked: root.valueUseGradient
-        onToggled: checked => root.valueUseGradient = checked
+        defaultValue: true
+        onToggled: checked => {
+            root.valueUseGradient = checked
+            root.saveSettings()
+        }
     }
 
     NToggle {
         label: "Fade When Idle"
         description: "Fade out when no audio is playing"
         checked: root.valueFadeWhenIdle
-        onToggled: checked => root.valueFadeWhenIdle = checked
+        defaultValue: true
+        onToggled: checked => {
+            root.valueFadeWhenIdle = checked
+            root.saveSettings()
+        }
     }
 
     NToggle {
         label: "Use Custom Colors"
         description: "Override theme colors with your own"
         checked: root.valueUseCustomColors
-        onToggled: checked => root.valueUseCustomColors = checked
+        defaultValue: false
+        onToggled: checked => {
+            root.valueUseCustomColors = checked
+            root.saveSettings()
+        }
     }
 
     // ── Custom color pickers ──────────────────────────────────────────────────
@@ -152,7 +201,10 @@ ColumnLayout {
         NColorPicker {
             screen: Screen
             selectedColor: root.valueCustomPrimary
-            onColorSelected: color => root.valueCustomPrimary = color
+            onColorSelected: color => {
+                root.valueCustomPrimary = color
+                root.saveSettings()
+            }
         }
     }
 
@@ -164,25 +216,29 @@ ColumnLayout {
         NColorPicker {
             screen: Screen
             selectedColor: root.valueCustomSecondary
-            onColorSelected: color => root.valueCustomSecondary = color
+            onColorSelected: color => {
+                root.valueCustomSecondary = color
+                root.saveSettings()
+            }
         }
     }
 
     // ── Save ──────────────────────────────────────────────────────────────────
     function saveSettings() {
-        if (!pluginApi) return
-        pluginApi.pluginSettings.mode                = root.valueMode
-        pluginApi.pluginSettings.barCount            = root.valueBarCount
-        pluginApi.pluginSettings.fps                 = root.valueFps
-        pluginApi.pluginSettings.sensitivity         = root.valueSensitivity
-        pluginApi.pluginSettings.smoothing           = root.valueSmoothing
-        pluginApi.pluginSettings.useGradient         = root.valueUseGradient
-        pluginApi.pluginSettings.fadeWhenIdle        = root.valueFadeWhenIdle
-        pluginApi.pluginSettings.useCustomColors     = root.valueUseCustomColors
-        pluginApi.pluginSettings.customPrimaryColor   = root.valueCustomPrimary.toString()
-        pluginApi.pluginSettings.customSecondaryColor = root.valueCustomSecondary.toString()
-        pluginApi.pluginSettings.customWidth          = root.valueCustomWidth
-        pluginApi.pluginSettings.customHeight         = root.valueCustomHeight
-        pluginApi.saveSettings()
+        if (widgetSettings == undefined || widgetSettings.data == undefined) return;
+        widgetSettings.data.direction            = root.valueDirection;
+        widgetSettings.data.mode                 = root.valueMode;
+        widgetSettings.data.barCount             = root.valueBarCount;
+        widgetSettings.data.fps                  = root.valueFps;
+        widgetSettings.data.sensitivity          = root.valueSensitivity;
+        widgetSettings.data.smoothing            = root.valueSmoothing;
+        widgetSettings.data.useGradient          = root.valueUseGradient;
+        widgetSettings.data.fadeWhenIdle         = root.valueFadeWhenIdle;
+        widgetSettings.data.useCustomColors      = root.valueUseCustomColors;
+        widgetSettings.data.customPrimaryColor   = root.valueCustomPrimary.toString();
+        widgetSettings.data.customSecondaryColor = root.valueCustomSecondary.toString();
+        widgetSettings.data.customWidth          = root.valueCustomWidth;
+        widgetSettings.data.customHeight         = root.valueCustomHeight;
+        widgetSettings.save();
     }
 }
