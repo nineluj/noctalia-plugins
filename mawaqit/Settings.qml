@@ -18,6 +18,7 @@ ColumnLayout {
   property bool   valuePlayAzan:          cfg.playAzan          ?? defaults.playAzan          ?? false
   property string valueAzanFile:          cfg.azanFile          ?? defaults.azanFile          ?? "azan1.mp3"
   property int    valueHijriDayOffset:    cfg.hijriDayOffset    ?? defaults.hijriDayOffset    ?? 0
+  property int    valueWeekStartDay:      cfg.weekStartDay      ?? defaults.weekStartDay      ?? 1
 
   property bool previewing: false
 
@@ -107,6 +108,27 @@ ColumnLayout {
     onSelected: key => root.valueHijriDayOffset = parseInt(key)
   }
 
+  NDivider { Layout.fillWidth: true }
+
+  // ── Calendar ──────────────────────────────────────────────────────────────
+
+  NHeader {
+    label: pluginApi?.tr("settings.calendar.header") || "Calendar"
+    Layout.bottomMargin: -Style.marginM
+  }
+
+  NComboBox {
+    Layout.fillWidth: true
+    label: pluginApi?.tr("settings.weekStartDay.label") || "First day of week"
+    description: pluginApi?.tr("settings.weekStartDay.desc") || "Choose which day starts the calendar week. Also determines the Jumu'ah column highlight."
+    currentKey: String(root.valueWeekStartDay)
+    model: [
+      { "key": "6", "name": "Saturday" },
+      { "key": "0", "name": "Sunday"   },
+      { "key": "1", "name": "Monday"   }
+    ]
+    onSelected: key => root.valueWeekStartDay = parseInt(key)
+  }
 
   NDivider { Layout.fillWidth: true }
 
@@ -236,6 +258,7 @@ ColumnLayout {
     pluginApi.pluginSettings.azanFile          = root.valueAzanFile
     pluginApi.pluginSettings.school            = root.valueSchool
     pluginApi.pluginSettings.hijriDayOffset    = root.valueHijriDayOffset
+    pluginApi.pluginSettings.weekStartDay      = root.valueWeekStartDay
     pluginApi.saveSettings()
     Logger.d("Mawaqit", "Settings saved")
   }
