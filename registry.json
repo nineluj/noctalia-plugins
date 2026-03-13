@@ -197,7 +197,7 @@
     {
       "id": "deskvis",
       "name": "DeskVis",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "official": false,
       "author": "HAVEKziad",
       "description": "Audio visualizer desktop widget — bars, wave, or mirror. Supports all directions. Transparent, follows color scheme.",
@@ -207,7 +207,7 @@
         "Desktop",
         "Audio"
       ],
-      "lastUpdated": "2026-03-13T12:22:01Z"
+      "lastUpdated": "2026-03-13T12:58:00Z"
     },
     {
       "id": "dns-switcher",
