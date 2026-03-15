@@ -941,7 +941,7 @@
     {
       "id": "timer",
       "name": "Timer",
-      "version": "1.1.1",
+      "version": "1.1.2",
       "official": true,
       "author": "Noctalia Team",
       "description": "A timer and stopwatch plugin for the bar & control center.",
@@ -952,7 +952,7 @@
         "Bar",
         "Utility"
       ],
-      "lastUpdated": "2026-03-09T13:28:20+01:00"
+      "lastUpdated": "2026-03-15T21:18:27+01:00"
     },
     {
       "id": "todo",
