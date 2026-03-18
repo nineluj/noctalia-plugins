@@ -1069,6 +1069,22 @@
       "lastUpdated": "2026-03-15T10:09:13-04:00"
     },
     {
+      "id": "web-search",
+      "name": "Web Search",
+      "version": "1.0.0",
+      "official": false,
+      "author": "Rigelyon",
+      "description": "Search the Internet from the Launcher.",
+      "repository": "https://github.com/noctalia-dev/noctalia-plugins",
+      "minNoctaliaVersion": "3.9.0",
+      "license": "MIT",
+      "tags": [
+        "Launcher",
+        "Utility"
+      ],
+      "lastUpdated": "2026-03-17T09:56:15+07:00"
+    },
+    {
       "id": "weekly-calendar",
       "name": "Weekly Calendar",
       "version": "1.0.4",
