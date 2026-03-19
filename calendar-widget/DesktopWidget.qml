@@ -10,10 +10,8 @@ DraggableDesktopWidget {
     id: root
     property var pluginApi: null
 
-    // Sync with plugin settings
-    readonly property bool startOnMonday: pluginApi?.pluginSettings?.startOnMonday ?? true
-
-    // --- Sizing ---
+	readonly property bool startOnMonday: pluginApi?.pluginSettings?.startOnMonday ?? true
+	// --- Sizing ---
     readonly property real _width: Math.round(250 * widgetScale)
     readonly property real _height: Math.round(285 * widgetScale)
     implicitWidth: _width

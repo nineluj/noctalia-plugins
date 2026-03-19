@@ -8,6 +8,7 @@ Item {
     implicitWidth: 400
     implicitHeight: 200
 
+    // This is the only object reliably injected into the Settings Window
     property var pluginApi: null
 
     ColumnLayout {
@@ -16,7 +17,7 @@ Item {
         spacing: Style.marginM
 
         NText {
-            text: pluginApi?.tr("menu.title")
+            text: pluginApi?.tr("menu.title") ?? "Calendar Settings"
             font.bold: true
             font.pointSize: Style.fontSizeM
             color: Color.mPrimary
@@ -26,32 +27,34 @@ Item {
             Layout.fillWidth: true
             
             NText { 
-                text: pluginApi?.tr("menu.settings")
+                text: pluginApi?.tr("menu.settings") ?? "Start Week on Monday"
                 Layout.fillWidth: true
                 color: Color.mOnSurface
             }
             
-            // Using a Button as a Toggle (Uncrashable alternative to NToggle)
             NButton {
+                // Accessing the global plugin settings instead of widgetData
                 property bool isMonday: pluginApi?.pluginSettings?.startOnMonday ?? true
                 text: isMonday ? "Monday" : "Sunday"
                 
                 onClicked: {
                     isMonday = !isMonday;
+                    
                     if (pluginApi && pluginApi.pluginSettings) {
+                        // 1. Update the Global setting
                         pluginApi.pluginSettings.startOnMonday = isMonday;
-                        Logger.i("CalendarPlugin", "Manual Switch to: " + (isMonday ? "Mon" : "Sun"));
+                        
+                        // 2. Tell Noctalia to write the change to disk
+                        pluginApi.saveSettings();
+                        
+                        Logger.i("CalendarPlugin", "Saved to Global Settings: " + isMonday);
+                    } else {
+                        Logger.e("CalendarPlugin", "CRITICAL: pluginSettings is missing!");
                     }
                 }
             }
         }
         
         Item { Layout.fillHeight: true }
-    }
-
-    function saveSettings() {
-        if (pluginApi) {
-            pluginApi.saveSettings();
-        }
     }
 }
