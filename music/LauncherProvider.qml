@@ -9,7 +9,7 @@ Item {
 
   property var pluginApi: null
   property var launcher: null
-  property string name: pluginApi?.tr("common.music") || "Music"
+  property string name: pluginApi?.tr("common.music") || "music-search"
   property bool handleSearch: false
   property string supportedLayouts: "list"
   property string iconMode: Settings.data.appLauncher.iconMode
@@ -19,7 +19,7 @@ Item {
 
   readonly property var mainInstance: pluginApi?.mainInstance
   readonly property string helperPath: mainInstance?.helperPath || Qt.resolvedUrl("musicctl.sh").toString().replace("file://", "")
-  readonly property string commandName: ">" + (pluginApi?.manifest?.metadata?.commandPrefix || "music")
+  readonly property string commandName: ">" + (pluginApi?.manifest?.metadata?.commandPrefix || "music-search")
 
   property string activeSearchQuery: ""
   property string pendingSearchQuery: ""
@@ -64,7 +64,7 @@ Item {
           root.searchResults = [];
           root.lastCompletedQuery = completedQuery;
           root.searchError = pluginApi?.tr("errors.searchMalformed") || "Search results were malformed.";
-          Logger.w("MusicLauncher", "Failed to parse search results:", error);
+          Logger.w("MusicSearchLauncher", "Failed to parse search results:", error);
         }
       } else if (!staleSearch) {
         root.searchResults = [];
@@ -1183,7 +1183,7 @@ Item {
                ? "Queue"
         : (item.kind === "search"
                ? (mainInstance?.providerLabel(itemProviderKey(item)) || "YouTube")
-               : (item.kind === "custom-url" || item.kind === "save-url" ? (pluginApi?.tr("common.customUrl") || "Custom URL") : (pluginApi?.tr("common.music") || "Music"))));
+               : (item.kind === "custom-url" || item.kind === "save-url" ? (pluginApi?.tr("common.customUrl") || "Custom URL") : (pluginApi?.tr("common.music") || "music-search"))));
     return previewItem;
   }
 
@@ -1549,7 +1549,7 @@ Item {
   function buildStatusItem() {
     var playing = mainInstance?.isPlaying === true;
     var starting = mainInstance?.playbackStarting === true;
-    var title = playing || starting ? (mainInstance?.currentTitle || (starting ? (pluginApi?.tr("status.starting") || "Starting playback") : (pluginApi?.tr("status.nowPlaying") || "Now playing"))) : (pluginApi?.tr("status.ready") || "Music ready");
+    var title = playing || starting ? (mainInstance?.currentTitle || (starting ? (pluginApi?.tr("status.starting") || "Starting playback") : (pluginApi?.tr("status.nowPlaying") || "Now playing"))) : (pluginApi?.tr("status.ready") || "music-search ready");
     var savedCurrentEntry = mainInstance?.findSavedEntry({
                                                    "id": mainInstance?.currentEntryId || "",
                                                    "url": mainInstance?.currentUrl || ""
@@ -1646,7 +1646,7 @@ Item {
   function buildSearchHintItem(message) {
     return {
       "name": pluginApi?.tr("search.title") || "Search music",
-      "description": message || pluginApi?.tr("search.hint") || "Try `>music burial`, `yt: burial`, `sc: artist`, `local: song`, `queue`, `#night`, `artist:name`, `rating:>=4`, `provider:local`, `playlist:name`, `speed:1.05`, or paste a URL.",
+      "description": message || pluginApi?.tr("search.hint") || "Try `>music-search burial`, `yt: burial`, `sc: artist`, `local: song`, `queue`, `#night`, `artist:name`, `rating:>=4`, `provider:local`, `playlist:name`, `speed:1.05`, or paste a URL.",
       "icon": "search",
       "isTablerIcon": true,
       "isImage": false,

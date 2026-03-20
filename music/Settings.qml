@@ -90,7 +90,7 @@ ColumnLayout {
 
   function saveSettings() {
     if (!pluginApi) {
-      Logger.e("Music", "Cannot save settings: pluginApi is null");
+      Logger.e("MusicSearch", "Cannot save settings: pluginApi is null");
       return;
     }
 

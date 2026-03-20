@@ -1407,7 +1407,7 @@ Item {
         root.queueEntries = [];
       }
     } catch (error) {
-      Logger.w("Music", "Failed to parse queue:", error);
+      Logger.w("MusicSearch", "Failed to parse queue:", error);
       root.queueEntries = [];
     }
   }
@@ -1884,7 +1884,7 @@ Item {
         }
       }
     } catch (error) {
-      Logger.w("Music", "Failed to parse music state:", error);
+      Logger.w("MusicSearch", "Failed to parse music state:", error);
     }
   }
 
@@ -1920,7 +1920,7 @@ Item {
         root.libraryEntries = [];
       }
     } catch (error) {
-      Logger.w("Music", "Failed to parse music library:", error);
+      Logger.w("MusicSearch", "Failed to parse music library:", error);
       root.libraryEntries = [];
     }
   }
@@ -1945,7 +1945,7 @@ Item {
       root.downloadCacheMaxMb = Number(settings.downloadCacheMaxMb || 0);
       root.ytPlayerClient = settings.ytPlayerClient || "android";
     } catch (error) {
-      Logger.w("Music", "Failed to parse music settings:", error);
+      Logger.w("MusicSearch", "Failed to parse music settings:", error);
     }
   }
 
@@ -1964,7 +1964,7 @@ Item {
         root.playlistEntries = [];
       }
     } catch (error) {
-      Logger.w("Music", "Failed to parse playlists:", error);
+      Logger.w("MusicSearch", "Failed to parse playlists:", error);
       root.playlistEntries = [];
     }
   }

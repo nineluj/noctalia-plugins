@@ -1,6 +1,6 @@
 {
   "id": "music",
-  "name": "Music",
+  "name": "music-search",
   "version": "1.0.0",
   "minNoctaliaVersion": "4.6.6",
   "author": "kevichi7",
@@ -21,7 +21,7 @@
     "plugins": []
   },
   "metadata": {
-    "commandPrefix": "music",
+    "commandPrefix": "music-search",
     "defaultSettings": {
       "previewMetadataMode": "always",
       "showUploaderMetadata": true,

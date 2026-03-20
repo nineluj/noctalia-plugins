@@ -444,7 +444,7 @@ Item {
               chips.push({
                            "label": detailCacheOwner?.pluginApi?.tr("preview.chipSaved") || "Saved",
                            "clickable": true,
-                           "query": (detailCacheOwner?.commandName || ">music") + " saved:"
+                           "query": (detailCacheOwner?.commandName || ">music-search") + " saved:"
                          });
             }
             if (isItemStartingNow(currentItem)) {
@@ -461,7 +461,7 @@ Item {
                 chips.push({
                              "label": "#" + tag,
                              "clickable": true,
-                             "query": (detailCacheOwner?.commandName || ">music") + " #" + tag
+                             "query": (detailCacheOwner?.commandName || ">music-search") + " #" + tag
                            });
               }
             }

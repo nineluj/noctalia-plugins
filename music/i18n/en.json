@@ -1,6 +1,6 @@
 {
   "plugin": {
-    "name": "Music"
+    "name": "music-search"
   },
   "command": {
     "description": "Search music ({provider}), play audio, and save favorites."
@@ -10,7 +10,7 @@
     "customUrl": "Custom URL",
     "downloadedTrack": "Downloaded Track",
     "queuedUrl": "Queued URL",
-    "music": "Music",
+    "music": "music-search",
     "onePlay": "1 play",
     "plays": "{count} plays"
   },
@@ -29,7 +29,7 @@
   "status": {
     "starting": "Starting playback",
     "nowPlaying": "Now playing",
-    "ready": "Music ready",
+    "ready": "music-search ready",
     "backgroundPlayback": "Background mpv playback",
     "searchPrompt": "Search {provider}, paste a URL, or open a saved track.",
     "startingProviderPlayback": "Starting {provider} playback...",
@@ -78,7 +78,7 @@
     "failed": "Search failed",
     "failedDefault": "yt-dlp could not resolve results.",
     "title": "Search music",
-    "hint": "Try `>music burial`, `yt: burial`, `sc: artist`, `local: song`, `queue`, `#night`, `artist:name`, `rating:>=4`, `provider:local`, `playlist:name`, `speed:1.05`, or paste a URL.",
+    "hint": "Try `>music-search burial`, `yt: burial`, `sc: artist`, `local: song`, `queue`, `#night`, `artist:name`, `rating:>=4`, `provider:local`, `playlist:name`, `speed:1.05`, or paste a URL.",
     "noResults": "No saved or search results for \"{query}\".",
     "typeMore": "Type at least 2 characters to search {provider}."
   },
