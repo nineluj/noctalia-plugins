@@ -76,4 +76,4 @@ binds {
 
 ![OBS Control preview](preview.png)
 
-![OBS Control settings](settings.png)
+![OBS Control settings](./assets/settings.png)

@@ -78,6 +78,18 @@ cargo install gifski
 ```
 
 ## Compatibility:
+NixOS:
+Add to your configuration.nix or home.nix:
+```bash
+environment.systemPackages = with pkgs; [
+  grim slurp wl-clipboard tesseract imagemagick zbar curl
+  translate-shell wf-recorder ffmpeg gifski
+];
+```
+
+For additional OCR languages, use e.g. ```(pkgs.tesseract.override { enableLanguages = [ "eng" "deu" ]; })```
+
+Compatibility:
 Tested on Hyprland and Niri.
 
 IPC commands:
