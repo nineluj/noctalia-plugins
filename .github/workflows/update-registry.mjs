@@ -7,13 +7,13 @@
  * an updated registry.json with plugin metadata.
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import { execSync } from 'child_process'
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'fs'
+import { join } from 'path'
 
 const REGISTRY_VERSION = 1;
-const ROOT_DIR = path.join(__dirname, '..', '..');
-const REGISTRY_PATH = path.join(ROOT_DIR, 'registry.json');
+const ROOT_DIR = join(__dirname, '..', '..');
+const REGISTRY_PATH = join(ROOT_DIR, 'registry.json');
 
 /**
  * Get the last commit date for a file using git
@@ -35,17 +35,17 @@ function getLastCommitDate(filePath) {
  * Check if a directory contains a valid plugin (has manifest.json)
  */
 function isPluginDirectory(dirPath) {
-  const manifestPath = path.join(dirPath, 'manifest.json');
-  return fs.existsSync(manifestPath);
+  const manifestPath = join(dirPath, 'manifest.json');
+  return existsSync(manifestPath);
 }
 
 /**
  * Read and parse a plugin's manifest.json
  */
 function readPluginManifest(dirPath) {
-  const manifestPath = path.join(dirPath, 'manifest.json');
+  const manifestPath = join(dirPath, 'manifest.json');
   try {
-    const content = fs.readFileSync(manifestPath, 'utf8');
+    const content = readFileSync(manifestPath, 'utf8');
     return JSON.parse(content);
   } catch (error) {
     console.error(`Error reading manifest from ${dirPath}:`, error.message);
@@ -57,7 +57,7 @@ function readPluginManifest(dirPath) {
  * Extract registry-relevant fields from a plugin manifest
  */
 function extractRegistryEntry(manifest, dirPath) {
-  const manifestPath = path.join(dirPath, 'manifest.json');
+  const manifestPath = join(dirPath, 'manifest.json');
   // Extract only the fields needed for the registry
   return {
     id: manifest.id,
@@ -80,7 +80,7 @@ function extractRegistryEntry(manifest, dirPath) {
 function scanPlugins() {
   const plugins = [];
 
-  const items = fs.readdirSync(ROOT_DIR, { withFileTypes: true });
+  const items = readdirSync(ROOT_DIR, { withFileTypes: true });
 
   for (const item of items) {
     // Skip non-directories and hidden/special directories
@@ -89,7 +89,7 @@ function scanPlugins() {
       continue;
     }
 
-    const dirPath = path.join(ROOT_DIR, item.name);
+    const dirPath = join(ROOT_DIR, item.name);
 
     if (isPluginDirectory(dirPath)) {
       const manifest = readPluginManifest(dirPath);
@@ -122,7 +122,7 @@ function generateRegistry(plugins) {
  */
 function writeRegistry(registry) {
   const content = JSON.stringify(registry, null, 2) + '\n';
-  fs.writeFileSync(REGISTRY_PATH, content, 'utf8');
+  writeFileSync(REGISTRY_PATH, content, 'utf8');
 }
 
 /**
